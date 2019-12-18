@@ -1,6 +1,6 @@
 QT       += core gui widgets
 
-TARGET = xneviewer
+TARGET = xleviewer
 TEMPLATE = app
 
 CONFIG += c++11
