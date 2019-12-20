@@ -148,7 +148,7 @@ void GuiMainWindow::processFile(QString sFileName, bool bReload)
             }
             else
             {
-                QMessageBox::critical(this,tr("Error"),tr("It is not a valid NE file!"));
+                QMessageBox::critical(this,tr("Error"),tr("It is not a valid LE file!"));
             }
         }
         else
