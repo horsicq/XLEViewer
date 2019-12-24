@@ -43,7 +43,7 @@ DialogOptions::~DialogOptions()
 
 void DialogOptions::loadOptions(XLEVIEWER::OPTIONS *pOptions)
 {
-    QSettings settings(QApplication::applicationDirPath()+QDir::separator()+"xpeviewer.ini",QSettings::IniFormat);
+    QSettings settings(QApplication::applicationDirPath()+QDir::separator()+"xleviewer.ini",QSettings::IniFormat);
 
     pOptions->bScanAfterOpen=settings.value("ScanAfterOpen",true).toBool();
     pOptions->bSaveLastDirectory=settings.value("SaveLastDirectory",true).toBool();
@@ -60,7 +60,7 @@ void DialogOptions::loadOptions(XLEVIEWER::OPTIONS *pOptions)
 
 void DialogOptions::saveOptions(XLEVIEWER::OPTIONS *pOptions)
 {
-    QSettings settings(QApplication::applicationDirPath()+QDir::separator()+"xpeviewer.ini",QSettings::IniFormat);
+    QSettings settings(QApplication::applicationDirPath()+QDir::separator()+"xleviewer.ini",QSettings::IniFormat);
 
     settings.setValue("ScanAfterOpen",pOptions->bScanAfterOpen);
     settings.setValue("SaveLastDirectory",pOptions->bSaveLastDirectory);
