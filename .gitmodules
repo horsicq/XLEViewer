@@ -13,3 +13,6 @@
 [submodule "Formats"]
 	path = Formats
 	url = https://github.com/horsicq/Formats.git
+[submodule "XMemoryMapWidget"]
+	path = XMemoryMapWidget
+	url = https://github.com/horsicq/XMemoryMapWidget.git
