@@ -1,23 +1,23 @@
-// copyright (c) 2019-2020 hors<horsicq@gmail.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
+/* Copyright (c) 2019-2021 hors<horsicq@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 #include "guimainwindow.h"
 #include "ui_guimainwindow.h"
 
@@ -27,43 +27,62 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent) :
 {
     ui->setupUi(this);
 
-    pFile=nullptr;
+    g_pFile=nullptr;
 
-    setWindowTitle(QString("%1 v%2").arg(X_APPLICATIONNAME).arg(X_APPLICATIONVERSION));
+    setWindowTitle(XOptions::getTitle(X_APPLICATIONDISPLAYNAME,X_APPLICATIONVERSION));
 
     setAcceptDrops(true);
 
-    DialogOptions::loadOptions(&xOptions);
+    g_xOptions.setName(X_OPTIONSFILE);
+
+//    listIDs.append(XOptions::ID_SAVERECENTFILES);
+    g_xOptions.addID(XOptions::ID_STYLE);
+    g_xOptions.addID(XOptions::ID_QSS);
+    g_xOptions.addID(XOptions::ID_LANG);
+    g_xOptions.addID(XOptions::ID_STAYONTOP);
+    g_xOptions.addID(XOptions::ID_SAVELASTDIRECTORY);
+    g_xOptions.addID(XOptions::ID_SAVEBACKUP);
+    g_xOptions.addID(XOptions::ID_SEARCHSIGNATURESPATH);
+    g_xOptions.addID(XOptions::ID_SHOWLOGO);
+    g_xOptions.load();
+
+    g_xShortcuts.setName(X_SHORTCUTSFILE);
+
+    g_xShortcuts.addGroup(XShortcuts::GROUPID_STRINGS);
+    g_xShortcuts.addGroup(XShortcuts::GROUPID_SIGNATURES);
+    g_xShortcuts.addGroup(XShortcuts::GROUPID_HEX);
+    g_xShortcuts.addGroup(XShortcuts::GROUPID_DISASM);
+
+    g_xShortcuts.load();
+
     adjust();
 
     if(QCoreApplication::arguments().count()>1)
     {
         QString sFileName=QCoreApplication::arguments().at(1);
 
-        processFile(sFileName,true);
+        processFile(sFileName);
     }
 }
 
 GuiMainWindow::~GuiMainWindow()
 {
     closeCurrentFile();
-    DialogOptions::saveOptions(&xOptions);
+    g_xOptions.save();
+    g_xShortcuts.save();
+
     delete ui;
 }
 
 void GuiMainWindow::on_actionOpen_triggered()
 {
-    QString sDirectory;
-    if(xOptions.bSaveLastDirectory&&QDir().exists(xOptions.sLastDirectory))
-    {
-        sDirectory=xOptions.sLastDirectory;
-    }
+    QString sDirectory=g_xOptions.getLastDirectory();
 
-    QString sFileName=QFileDialog::getOpenFileName(this,tr("Open file..."),sDirectory,tr("All files (*)"));
+    QString sFileName=QFileDialog::getOpenFileName(this,tr("Open file")+QString("..."),sDirectory,tr("All files")+QString(" (*)"));
 
     if(!sFileName.isEmpty())
     {
-        processFile(sFileName,xOptions.bScanAfterOpen);
+        processFile(sFileName);
     }
 }
 
@@ -79,7 +98,7 @@ void GuiMainWindow::on_actionExit_triggered()
 
 void GuiMainWindow::on_actionOptions_triggered()
 {
-    DialogOptions dialogOptions(this,&xOptions);
+    DialogOptions dialogOptions(this,&g_xOptions);
     dialogOptions.exec();
 
     adjust();
@@ -93,69 +112,56 @@ void GuiMainWindow::on_actionAbout_triggered()
 
 void GuiMainWindow::adjust()
 {
-    Qt::WindowFlags wf=windowFlags();
-    if(xOptions.bStayOnTop)
-    {
-        wf|=Qt::WindowStaysOnTopHint;
-    }
-    else
-    {
-        wf&=~(Qt::WindowStaysOnTopHint);
-    }
-    setWindowFlags(wf);
+    g_xOptions.adjustStayOnTop(this);
 
-    show();
+    ui->widgetViewer->setOptions(g_formatOptions);
 }
 
-void GuiMainWindow::processFile(QString sFileName, bool bReload)
-{
+void GuiMainWindow::processFile(QString sFileName)
+{    
     if((sFileName!="")&&(QFileInfo(sFileName).isFile()))
     {
-        if(xOptions.bSaveLastDirectory)
-        {
-            QFileInfo fi(sFileName);
-            xOptions.sLastDirectory=fi.absolutePath();
-        }
+        g_xOptions.setLastFileName(sFileName);
+
         closeCurrentFile();
 
-        pFile=new QFile;
+        g_pFile=new QFile;
 
-        pFile->setFileName(sFileName);
+        g_pFile->setFileName(sFileName);
 
-        if(!pFile->open(QIODevice::ReadWrite))
+        if(!g_pFile->open(QIODevice::ReadWrite))
         {
-            if(!pFile->open(QIODevice::ReadOnly))
+            if(!g_pFile->open(QIODevice::ReadOnly))
             {
                 closeCurrentFile();
             }
         }
 
-        if(pFile)
+        if(g_pFile)
         {
-            XLE le(pFile);
+            XLE le(g_pFile);
             if(le.isValid())
             {
                 ui->stackedWidgetMain->setCurrentIndex(1);
-                formatOptions.bIsImage=false;
-                formatOptions.nImageBase=-1;
-                formatOptions.sBackupFileName=XBinary::getBackupName(pFile);
-                ui->widgetViewer->setData(pFile,&formatOptions);
+                g_formatOptions.bIsImage=false;
+                g_formatOptions.nImageBase=-1;
+                g_formatOptions.nStartType=SLE::TYPE_HEURISTICSCAN;
+                ui->widgetViewer->setData(g_pFile,g_formatOptions,0,0,0);
 
-                if(bReload)
-                {
-                    ui->widgetViewer->reload();
-                }
+                ui->widgetViewer->reload();
+
+                adjust();
 
                 setWindowTitle(sFileName);
             }
             else
             {
-                QMessageBox::critical(this,tr("Error"),tr("It is not a valid LE file!"));
+                QMessageBox::critical(this,tr("Error"),tr("It is not a valid file"));
             }
         }
         else
         {
-            QMessageBox::critical(this,tr("Error"),tr("Cannot open the file!"));
+            QMessageBox::critical(this,tr("Error"),tr("Cannot open file"));
         }
     }
 }
@@ -164,14 +170,14 @@ void GuiMainWindow::closeCurrentFile()
 {
     ui->stackedWidgetMain->setCurrentIndex(0);
 
-    if(pFile)
+    if(g_pFile)
     {
-        pFile->close();
-        delete pFile;
-        pFile=nullptr;
+        g_pFile->close();
+        delete g_pFile;
+        g_pFile=nullptr;
     }
 
-    setWindowTitle(QString("%1 v%2").arg(X_APPLICATIONNAME).arg(X_APPLICATIONVERSION));
+    setWindowTitle(XOptions::getTitle(X_APPLICATIONDISPLAYNAME,X_APPLICATIONVERSION));
 }
 
 void GuiMainWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -198,7 +204,7 @@ void GuiMainWindow::dropEvent(QDropEvent *event)
 
             sFileName=XBinary::convertFileName(sFileName);
 
-            processFile(sFileName,xOptions.bScanAfterOpen);
+            processFile(sFileName);
         }
     }
 }

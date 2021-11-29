@@ -23,21 +23,12 @@
 
 #include <QString>
 
-#define X_APPLICATIONNAME "XLEViewer"
+#define X_APPLICATIONDISPLAYNAME "XLEViewer"
+#define X_APPLICATIONNAME "xneviewer"
 #define X_APPLICATIONVERSION "0.01"
 #define X_ORGANIZATIONNAME "NTInfo"
 #define X_ORGANIZATIONDOMAIN "ntinfo.biz"
-
-namespace XLEVIEWER
-{
-    struct OPTIONS
-    {
-        bool bScanAfterOpen;
-        bool bSaveLastDirectory;
-        QString sLastDirectory;
-        bool bStayOnTop;
-        bool bSaveBackup;
-    };
-}
+#define X_OPTIONSFILE "xneviewer.ini"
+#define X_SHORTCUTSFILE "shortcuts.ini"
 
 #endif // _GLOBAL_H
