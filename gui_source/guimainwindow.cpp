@@ -55,6 +55,8 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent) :
 
     g_xShortcuts.load();
 
+    ui->widgetViewer->setGlobal(&g_xShortcuts,&g_xOptions);
+
     adjust();
 
     if(QCoreApplication::arguments().count()>1)
