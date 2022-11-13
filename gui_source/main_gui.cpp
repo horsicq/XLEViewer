@@ -18,18 +18,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "guimainwindow.h"
 #include <QApplication>
 #include <QStyleFactory>
 
-int main(int argc, char *argv[])
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
+#include "guimainwindow.h"
+
+int main(int argc, char *argv[]) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 #ifdef Q_OS_MAC
 #ifndef QT_DEBUG
-   QCoreApplication::setLibraryPaths(QStringList(QString(argv[0]).remove("MacOS/XLEViewer")+"PlugIns"));
+    QCoreApplication::setLibraryPaths(QStringList(QString(argv[0]).remove("MacOS/XLEViewer") + "PlugIns"));
 #endif
 #endif
     QCoreApplication::setOrganizationName(X_ORGANIZATIONNAME);
@@ -37,10 +37,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(X_APPLICATIONNAME);
     QCoreApplication::setApplicationVersion(X_APPLICATIONVERSION);
 
-    if((argc==2)&&((QString(argv[1])=="--version")||(QString(argv[1])=="-v")))
-    {
-        QString sInfo=QString("%1 v%2").arg(X_APPLICATIONDISPLAYNAME,X_APPLICATIONVERSION);
-        printf("%s\n",sInfo.toUtf8().data());
+    if ((argc == 2) && ((QString(argv[1]) == "--version") || (QString(argv[1]) == "-v"))) {
+        QString sInfo = QString("%1 v%2").arg(X_APPLICATIONDISPLAYNAME, X_APPLICATIONVERSION);
+        printf("%s\n", sInfo.toUtf8().data());
 
         return 0;
     }
@@ -56,7 +55,7 @@ int main(int argc, char *argv[])
     xOptions.addID(XOptions::ID_LANG);
     xOptions.load();
 
-    XOptions::adjustApplicationView(X_APPLICATIONNAME,&xOptions);
+    XOptions::adjustApplicationView(X_APPLICATIONNAME, &xOptions);
 
     GuiMainWindow w;
     w.show();
