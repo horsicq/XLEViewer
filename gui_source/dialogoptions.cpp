@@ -22,7 +22,8 @@
 
 #include "ui_dialogoptions.h"
 
-DialogOptions::DialogOptions(QWidget *pParent, XOptions *pOptions) : QDialog(pParent), ui(new Ui::DialogOptions) {
+DialogOptions::DialogOptions(QWidget *pParent, XOptions *pOptions) : QDialog(pParent), ui(new Ui::DialogOptions)
+{
     ui->setupUi(this);
 
     this->g_pOptions = pOptions;
@@ -43,11 +44,13 @@ DialogOptions::DialogOptions(QWidget *pParent, XOptions *pOptions) : QDialog(pPa
 #endif
 }
 
-DialogOptions::~DialogOptions() {
+DialogOptions::~DialogOptions()
+{
     delete ui;
 }
 
-void DialogOptions::on_pushButtonOK_clicked() {
+void DialogOptions::on_pushButtonOK_clicked()
+{
     g_pOptions->getCheckBox(ui->checkBoxSaveLastDirectory, XOptions::ID_SAVELASTDIRECTORY);
     g_pOptions->getCheckBox(ui->checkBoxStayOnTop, XOptions::ID_STAYONTOP);
     g_pOptions->getCheckBox(ui->checkBoxSaveBackup, XOptions::ID_SAVEBACKUP);
@@ -74,11 +77,13 @@ void DialogOptions::on_pushButtonOK_clicked() {
     this->close();
 }
 
-void DialogOptions::on_pushButtonCancel_clicked() {
+void DialogOptions::on_pushButtonCancel_clicked()
+{
     this->close();
 }
 
-void DialogOptions::on_toolButtonSearchSignatures_clicked() {
+void DialogOptions::on_toolButtonSearchSignatures_clicked()
+{
     QString sText = ui->lineEditSearchSignatures->text();
     QString sInitDirectory = XBinary::convertPathName(sText);
 
