@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
 
     xOptions.setName(X_OPTIONSFILE);
 
-    xOptions.addID(XOptions::ID_STYLE);
-    xOptions.addID(XOptions::ID_QSS);
-    xOptions.addID(XOptions::ID_LANG);
+    xOptions.addID(XOptions::ID_VIEW_STYLE);
+    xOptions.addID(XOptions::ID_VIEW_QSS);
+    xOptions.addID(XOptions::ID_VIEW_LANG);
     xOptions.load();
 
     XOptions::adjustApplicationView(X_APPLICATIONNAME, &xOptions);

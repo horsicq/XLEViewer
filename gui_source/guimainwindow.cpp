@@ -35,14 +35,14 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent) : QMainWindow(pParent), ui(new Ui
     g_xOptions.setName(X_OPTIONSFILE);
 
     //    listIDs.append(XOptions::ID_SAVERECENTFILES);
-    g_xOptions.addID(XOptions::ID_STYLE);
-    g_xOptions.addID(XOptions::ID_QSS);
-    g_xOptions.addID(XOptions::ID_LANG);
-    g_xOptions.addID(XOptions::ID_STAYONTOP);
-    g_xOptions.addID(XOptions::ID_SAVELASTDIRECTORY);
-    g_xOptions.addID(XOptions::ID_SAVEBACKUP);
-    g_xOptions.addID(XOptions::ID_SEARCHSIGNATURESPATH);
-    g_xOptions.addID(XOptions::ID_SHOWLOGO);
+    g_xOptions.addID(XOptions::ID_VIEW_STYLE);
+    g_xOptions.addID(XOptions::ID_VIEW_QSS);
+    g_xOptions.addID(XOptions::ID_VIEW_LANG);
+    g_xOptions.addID(XOptions::ID_VIEW_STAYONTOP);
+    g_xOptions.addID(XOptions::ID_FILE_SAVELASTDIRECTORY);
+    g_xOptions.addID(XOptions::ID_FILE_SAVEBACKUP);
+    g_xOptions.addID(XOptions::ID_SIGNATURES_PATH);
+    g_xOptions.addID(XOptions::ID_VIEW_SHOWLOGO);
     g_xOptions.load();
 
     g_xShortcuts.setName(X_SHORTCUTSFILE);
@@ -139,7 +139,7 @@ void GuiMainWindow::processFile(QString sFileName)
                 ui->stackedWidgetMain->setCurrentIndex(1);
                 g_formatOptions.bIsImage = false;
                 g_formatOptions.nImageBase = -1;
-                g_formatOptions.nStartType = SLE::TYPE_HEURISTICSCAN;
+                g_formatOptions.nStartType = SLE::TYPE_INFO;
                 ui->widgetViewer->setData(g_pFile, g_formatOptions, 0, 0, 0);
 
                 ui->widgetViewer->reload();
